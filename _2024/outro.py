@@ -9,7 +9,7 @@ class CursorOperation(Enum):
     BLINK_ON = 3
     BLINK_OFF = 4
 
-class Intro(Scene):
+class Outro(Scene):
     def construct(self):
         INSERT_TIME_PER_CHAR = 0.08
         DELETE_TIME_PER_CHAR = 0.06
@@ -22,13 +22,13 @@ class Intro(Scene):
             "Devinh",
             font = "monospace",
             color = CUSTOM_PURPLE,
-        ).scale(1.5).to_edge(LEFT).set_opacity(0.0)
+        ).scale(1.5).to_edge(LEFT)
         slogan = Text(
             "elop(yourself)",
             font = "monospace",
             color = CUSTOM_PURPLE,
             t2c = {"yourself":CUSTOM_YELLOW},
-        ).scale(1.5).next_to(name[2], RIGHT, buff=0.08).set_opacity(0.0)
+        ).scale(1.5).next_to(name[2], RIGHT, buff=0.08)
         cursor = Rectangle(
             color = GREY_A,
             fill_color = GREY_A,
@@ -38,7 +38,8 @@ class Intro(Scene):
         ).move_to(name[0]).shift(DOWN*0.06)
         save_y = cursor.get_y()
 
-        # Doing this the dumb way cuz
+        # Doing this the dumb way
+        # Manually matching the actual AddTextLetterByLetter and RemoveTextLetterByLetter animations below
         cursor_instructions = [
             [CursorOperation.INSERTION, 5],
             [CursorOperation.BLINK_OFF, 1],
