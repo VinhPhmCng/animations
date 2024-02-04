@@ -3,12 +3,32 @@ from manim import *
 class NumberSets(MovingCameraScene):
     def construct(self):
         # Natural numbers
+        ## Add in 0 -> 3
+        ## Add in extras and slide camera
+        ## Re-slide camera and remove extras
+        ## Add in natural number line
 
-        # Add in 0 -> 3
-        # Add in extras and slide camera
-        # Re-slide camera and remove extras
-        # Add in natural number line
+        # Integers
+        ## Add in -1 -> -3
+        ## Extend number line to the left
 
+        # Rational numbers
+        # Add in some fractions detailedly (-3/2, 1/3)
+        # Add in some others quickly
+        # Fill in number line a bit
+
+        # Real numbers
+        ## Add in sqrt(2) and pi visually
+        ## Add in some others quickly
+        ## Fill in number line -> continuous
+
+        # Reverse summary
+        ## Transform R -> Q -> Z -> N
+        ## Show sets' relationships
+
+
+        # ===============
+        # Natural numbers
         labeled_dots = [
             VGroup(
                 Dot(np.array([n, 0, 0]), radius=0.12, z_index=3),
@@ -54,7 +74,7 @@ class NumberSets(MovingCameraScene):
                 lag_ratio=0.2, rate_func=rush_into,
             ),
         )
-        self.wait(1.5)
+        self.wait(1.0)
 
         # Re-slide camera
         self.play(Restore(self.camera.frame), run_time=2.0, rate_func=smooth)
@@ -62,16 +82,13 @@ class NumberSets(MovingCameraScene):
 
         # Scale down natural dots
         # Remove extras
-        self.play(
-            *[ld[0].animate.scale(0.5) for ld in labeled_dots],
-            FadeOut(*extra_labeled_dots),
-            run_time = 0.8,
-        )
-        # Re-position labels of natural dots
-        self.play(
-            *[ld.animate.arrange(DOWN, buff=0.5).shift(RIGHT * ld[0].get_x()) for ld in labeled_dots],
-            run_time = 0.5,
-        )
+        for ld in labeled_dots:
+            ld.generate_target()
+            ld.target[0].scale(0.5)
+            ld.target.arrange(DOWN, buff=0.5, center=False)
+
+        self.play(FadeOut(*extra_labeled_dots))
+        self.play(*[MoveToTarget(ld) for ld in labeled_dots]) # Re-position labels of natural dots
 
         # Number line (natural)
         number_line = DashedLine(
@@ -82,14 +99,14 @@ class NumberSets(MovingCameraScene):
             stroke_color = YELLOW, 
             stroke_opacity = 0.8,
         ).add_tip(ArrowTriangleFilledTip(color=YELLOW, fill_opacity=0.8))
+        natural_number_line = number_line.copy()
 
         label = MathTex(r"\mathbb{N}").scale(1.5).align_to(number_line, RIGHT).shift(UP + RIGHT * 0.5)
+        natural_label = label.copy()
         title = Text("Natural Numbers").to_edge(UP)
+        #title = Text("Số Tự Nhiên").to_edge(UP)
 
-        self.play(
-            GrowFromEdge(number_line, LEFT),
-            run_time = 1.5,
-        )
+        self.play(GrowFromEdge(number_line, LEFT), run_time = 2.0)
         self.play(
             Write(label),
             Write(title),
@@ -97,7 +114,8 @@ class NumberSets(MovingCameraScene):
         )
         self.wait(1.0)
 
-        # Negative integers
+        # ========
+        # Integers
         negative_labeled_dots = [
             VGroup(
                 Dot(np.array([n, 0, 0]), radius=0.12, z_index=3).scale(0.5),
@@ -105,6 +123,7 @@ class NumberSets(MovingCameraScene):
             ).arrange(DOWN, buff=0.5).shift(RIGHT * n)
             for n in [-1, -2, -3, -4]
         ]
+
         # Re-position negative labels
         for nld in negative_labeled_dots:
             nld[1].shift(LEFT * 0.12)
@@ -114,7 +133,7 @@ class NumberSets(MovingCameraScene):
             self.play(ReplacementTransform(ld.copy(), negative_labeled_dots[i], path_arc=60*DEGREES))
         self.wait(1.0)
 
-        # Extend number line (integers)
+        # Extend number line (to integers)
         extended_number_line = DashedLine(
             start = negative_labeled_dots[-1][0].get_center(),
             end = extra_labeled_dots[0][0].get_center(),
@@ -126,18 +145,20 @@ class NumberSets(MovingCameraScene):
 
         integer_label = MathTex(r"\mathbb{Z}").scale(1.5).move_to(label)
         integer_title = Text("Integers").to_edge(UP)
+        #integer_title = Text("Số Nguyên").to_edge(UP)
 
         self.play(
             Transform(number_line, extended_number_line, run_time=2.0),
             Transform(label, integer_label, run_time=1.0),
             Transform(title, integer_title, run_time=1.0),
-            #run_time = 2.0,
         )
         self.wait(1.0)
 
-        self.play(FadeOut(title), run_time=1.0)
+        self.play(FadeOut(title))
         self.wait(1.0)
 
+        # ================
+        # Rational numbers
         # Zoom in
         # Also scale down labels
         texs = []
@@ -151,62 +172,76 @@ class NumberSets(MovingCameraScene):
             label.animate.scale(0.7),
             run_time = 1.0,
         )
+        self.wait(1.0)
 
-        # Rational
-        # Add in fractions
-        rational_dots = [
-            Dot(np.array([r, 0, 0]), radius=0.12, z_index=3, color=BLUE).scale(0.5).match_y(labeled_dots[0][0])
-            for r in [-3/2, 1/3]
-        ]
-
-        # -3/2 label
+        # Add in fractions detailedly
+        # -3/2
         mthree_over_two = MathTex(r"-3", r"\over", r"2").align_to(self.camera.frame, UL).shift(RIGHT*0.5 + DOWN*0.5)
         equals = MathTex(r"= -1.5").next_to(mthree_over_two, RIGHT)
+
+        mthree_segment = Line(start=labeled_dots[0][0].get_center(), end=negative_labeled_dots[-2][0].get_center(), color=GREEN)
+        mthree_over_two_divider = Dot(mthree_segment.point_from_proportion(0.5), radius=0.12, z_index=3, color=BLUE).scale(0.5)
 
         self.play(
             Succession(
                 ReplacementTransform(negative_labeled_dots[2][1].copy(), mthree_over_two[0], run_time=1.0),
+                GrowFromEdge(mthree_segment, RIGHT, run_time=1.0),
+                Circumscribe(mthree_segment, run_time=1.0),
                 GrowFromEdge(mthree_over_two[1], LEFT, run_time=1.0),
                 ReplacementTransform(labeled_dots[2][1].copy(), mthree_over_two[2], run_time=1.0),
+                GrowFromCenter(mthree_over_two_divider, run_time=1.0),
                 Write(equals, run_time=1.0),
+                Circumscribe(mthree_over_two_divider, shape=Circle, run_time=1.0),
                 Wait(run_time=1.0),
             )
-            #run_time = 5.0,
         )
         self.play(
             FadeOut(equals),
-            mthree_over_two.animate.scale(0.7).next_to(rational_dots[0], UP),
-            GrowFromCenter(rational_dots[0]),
+            mthree_over_two.animate.scale(0.7).next_to(mthree_over_two_divider, UP),
             run_time = 2.0,
         )
         self.wait(1.0)
 
-        # 1/3 label
+        self.play(FadeOut(mthree_segment))
+        self.wait(1.0)
+
+        # 1/3
         one_over_three = MathTex(r"1", r"\over", r"3").align_to(self.camera.frame, UL).shift(RIGHT*0.5 + DOWN*0.5)
         equals = MathTex(r"= 1.33333 \ldots", r"= 1.(3)").next_to(one_over_three, RIGHT)
+
+        one_segment = Line(start=labeled_dots[0][0].get_center(), end=labeled_dots[1][0].get_center(), color=GREEN)
+        one_over_three_dividers = [
+            Dot(one_segment.point_from_proportion(1/3 * i), radius=0.12, z_index=3, color=BLUE).scale(0.5)
+            for i in range(1, 3, 1)
+        ]
 
         self.play(
             Succession(
                 ReplacementTransform(labeled_dots[1][1].copy(), one_over_three[0], run_time=1.0),
+                GrowFromEdge(one_segment, LEFT, run_time=1.0),
+                Circumscribe(one_segment, run_time=1.0),
                 GrowFromEdge(one_over_three[1], LEFT, run_time=1.0),
                 ReplacementTransform(labeled_dots[3][1].copy(), one_over_three[2], run_time=1.0),
+                *[GrowFromCenter(div, run_time=1.0) for div in one_over_three_dividers],
                 Write(equals[0], run_time=1.0),
                 Wait(run_time=1.0),
                 Write(equals[1], run_time=1.0),
+                Circumscribe(one_over_three_dividers[0], shape=Circle, run_time=1.0),
                 Wait(run_time=1.0),
             )
-            #run_time 7.0,
         )
 
         self.play(
             FadeOut(equals),
-            one_over_three.animate.scale(0.7).next_to(rational_dots[1], UP),
-            GrowFromCenter(rational_dots[1]),
+            one_over_three.animate.scale(0.7).next_to(one_over_three_dividers[0], UP),
             run_time = 2.0,
         )
         self.wait(1.0)
 
-        # Add more fractions into the line
+        self.play(FadeOut(one_segment, one_over_three_dividers[1]))
+        self.wait(1.0)
+
+        # Add more fractions
         extra_rational_texs = [
             MathTex(tex).align_to(self.camera.frame, UL).shift(RIGHT*0.5 + DOWN*0.5)
             for tex in [
@@ -230,7 +265,7 @@ class NumberSets(MovingCameraScene):
             self.play(Write(tex), run_time=0.5)
             self.wait(1.0)
             self.play(FadeTransform(tex, dot), run_time=1.0)
-            self.wait(0.5)
+            self.wait(1.0)
 
         # Increase number line's density (rational)
         # while fading out fraction dots
@@ -244,20 +279,21 @@ class NumberSets(MovingCameraScene):
         ).add_tip(ArrowTriangleFilledTip(color=ORANGE, fill_opacity=0.9))
 
         rational_label = MathTex(r"\mathbb{Q}").move_to(label) # does NOT have to scale(0.7)
-        title = Text("Rational Numbers").scale(0.7).to_edge(UP)
+        title = Text("Rational Numbers").scale(0.7).to_edge(UP).shift(DOWN*0.5)
+        #title = Text("Số Hữu Tỷ").scale(0.7).to_edge(UP).shift(DOWN*0.5)
         self.play(
             Transform(label, rational_label, run_time=1.0),
             Write(title, run_time=1.0),
-            FadeOut(mthree_over_two, one_over_three, *rational_dots, *extra_rational_dots, run_time=4.0),
+            FadeOut(mthree_over_two, one_over_three, mthree_over_two_divider, one_over_three_dividers[0], *extra_rational_dots, run_time=4.0),
             Transform(number_line, denser_number_line, run_time=4.0),
-            #run_time = 4.0,
         )
         self.wait(1.0)
 
-        self.play(FadeOut(title), run_time=1.0)
+        self.play(FadeOut(title))
+        self.wait(1.0)
 
-        # Real
-        # Add in irrational numbers
+        # ===========
+        # Real numbers
         to_be_faded_out = []
 
         # sqrt(2)
@@ -275,7 +311,6 @@ class NumberSets(MovingCameraScene):
                 GrowFromPoint(b, b.get_start(), run_time=0.5),
                 GrowFromPoint(c, c.get_start(), run_time=0.5),
             )
-            #run_time = 1.5,
         )
 
         right_angle = RightAngle(a, b, quadrant=(-1, 1), length=0.15, color=GREEN)
@@ -287,10 +322,10 @@ class NumberSets(MovingCameraScene):
         self.play(
             Write(right_angle),
             Write(show_side_length),
-            run_time=0.5,
+            run_time=1.0,
         )
         self.wait(1.0)
-        self.play(FadeOut(show_side_length), run_time=1.0)
+        self.play(FadeOut(show_side_length))
         self.wait(1.0)
 
         sqrt_two = MathTex(r"\sqrt{2}", r"= 1.4142135623\ldots").align_to(self.camera.frame, UL).shift(RIGHT*0.5 + DOWN*0.5)
@@ -305,14 +340,14 @@ class NumberSets(MovingCameraScene):
 
         show_hypotenuse_length[0].shift(UP*0.2 + RIGHT*0.2)
 
-        self.play(Write(show_hypotenuse_length), run_time=1.0)
+        self.play(Write(show_hypotenuse_length))
         self.wait(1.0)
         self.play(
             FadeOut(show_hypotenuse_length[1]),
             ReplacementTransform(show_hypotenuse_length[0], sqrt_two[0]),
             run_time = 1.0,
         )
-        self.play(Write(sqrt_two[1]), run_time=1.0)
+        self.play(Write(sqrt_two[1]))
         self.wait(1.0)
 
         c_copy = c.copy()
@@ -325,9 +360,8 @@ class NumberSets(MovingCameraScene):
             LaggedStart(
                 GrowFromCenter(sqrt_two_dot, run_time=1.0),
                 FadeOut(a, b, c, right_angle, arc, c_copy, run_time=1.0),
-                lag_ratio=0.8,
+                lag_ratio=1.0,
             ),
-            #run_time = 1.8,
         )
         self.wait(1.0)
         to_be_faded_out.append(sqrt_two_dot)
@@ -367,7 +401,9 @@ class NumberSets(MovingCameraScene):
 
         into_line = Line(start=labeled_dots[0][0].get_center(), end=labeled_dots[0][0].get_center() + LEFT*3.2, color=GREEN).match_y(labeled_dots[0][0])
 
-        circle.add_updater(lambda mob: mob.rotate(1.99*DEGREES)) # 60fps, 3 seconds => 180fps => 2 degrees/frame
+        # Theoretically, 60fps, 3 seconds => 180fps => 2 degrees/frame
+        # But it seems the longer the total animation, the lower this number should be
+        circle.add_updater(lambda mob: mob.rotate(1.984*DEGREES))
         self.play(
             circle.animate.shift(LEFT*3.2),
             GrowFromEdge(into_line, RIGHT),
@@ -386,12 +422,11 @@ class NumberSets(MovingCameraScene):
                 FadeOut(circle, radius, into_line, run_time=1.0),
                 lag_ratio=0.8,
             ),
-            #run_time = 1.8,
         )
         self.wait(1.0)
         to_be_faded_out.append(mpi_dot)
 
-        self.play(FadeIn(mpi, shift=DOWN), run_time=1.0)
+        self.play(FadeIn(mpi, shift=DOWN))
         self.wait(1.0)
         to_be_faded_out.append(mpi)
 
@@ -403,14 +438,13 @@ class NumberSets(MovingCameraScene):
                 ReplacementTransform(mpi_copy, pi[0], run_time=1.0),
                 Write(pi[1], run_time=1.0),
             )
-            #run_time = 2.0
         )
         self.wait(1.0)
 
-        self.play(FadeOut(pi), run_time=1.0)
+        self.play(FadeOut(pi))
         self.wait(1.0)
 
-        # Extra irrationals
+        # Other irrationals
         irrational_texs = [
             MathTex(*tex).align_to(self.camera.frame, UL).shift(RIGHT*0.5 + DOWN*0.5)
             for tex in [
@@ -428,7 +462,7 @@ class NumberSets(MovingCameraScene):
 
         for i, pair in enumerate(zip(irrational_texs, irrational_dots)):
             tex, dot = pair
-            self.play(Write(tex), run_time=1.0)
+            self.play(Write(tex))
             self.wait(1.0)
 
             self.play(
@@ -449,7 +483,7 @@ class NumberSets(MovingCameraScene):
             start = negative_labeled_dots[-1][0].get_center(),
             end = extra_labeled_dots[0][0].get_center(),
             dash_length = 0.1,
-            dashed_ratio = 0.9,
+            dashed_ratio = 0.8,
             stroke_color = RED,
             stroke_opacity = 1.0,
         ).add_tip(ArrowTriangleFilledTip(color=RED))
@@ -462,7 +496,8 @@ class NumberSets(MovingCameraScene):
         ).add_tip(ArrowTriangleFilledTip(color=RED))
 
         real_label = MathTex(r"\mathbb{R}").move_to(label) # does NOT have to scale(0.7)
-        title = Text("Real Numbers").scale(0.7).to_edge(UP)
+        title = Text("Real Numbers").scale(0.7).to_edge(UP).shift(DOWN*0.5)
+        #title = Text("Số Thực").scale(0.7).to_edge(UP).shift(DOWN*0.5)
 
         self.play(
             Write(title, run_time=1.0),
@@ -470,19 +505,67 @@ class NumberSets(MovingCameraScene):
             FadeOut(*to_be_faded_out, run_time=2.0),
             Transform(number_line, denser_number_line, run_time=2.0),
         )
-        self.play(FadeTransform(number_line, continuous_number_line), run_time=1.0)
+        self.play(FadeTransform(number_line, continuous_number_line))
         self.wait(1.0)
 
-        self.play(FadeOut(title), run_time=1.0)
+        self.play(ShowPassingFlash(continuous_number_line.copy().set_color(GREEN), time_width=1.0, run_time=3.0))
+        self.wait(1.0)
+
+        self.play(FadeOut(title))
         self.wait(1.0)
 
         # Zoom back out
         # Re-scale labels appropriately
         self.play(
-            Restore(self.camera.frame),
+            self.camera.frame.animate.scale(1.0 / 0.7),
             *[Restore(tex) for tex in texs],
             label.animate.scale(1.0 / 0.7),
             run_time = 1.0,
         )
+        self.wait(1.0)
+
+        # =======
+        # Summary
+        subsets = VGroup(
+            MathTex(r"\mathbb{N} \subset"),
+            MathTex(r"\mathbb{Z} \subset"),
+            MathTex(r"\mathbb{Q} \subset"),
+            MathTex(r"\mathbb{R}"),
+        ).arrange(RIGHT).scale(1.5).to_edge(UP).shift(DOWN*0.5)
+
+        self.camera.frame.save_state()
+        self.play(
+            Succession(
+                Write(subsets[3]),
+                FadeTransform(continuous_number_line, number_line),
+            )
+        )
+        self.play(
+            Succession(
+                AnimationGroup(
+                    Transform(number_line, denser_number_line),
+                    Transform(label, rational_label),
+                ),
+                Write(subsets[2]),
+
+                AnimationGroup(
+                    Transform(number_line, extended_number_line),
+                    Transform(label, integer_label),
+                ),
+                Write(subsets[1]),
+
+                AnimationGroup(
+                    Transform(number_line, natural_number_line),
+                    Transform(label, natural_label),
+                    FadeOut(*negative_labeled_dots[:3]),
+                ),
+                Write(subsets[0]),
+            )
+        )
+        self.wait(1.0)
+
+        # ======
+        # Ending
+        self.play(FadeOut(*self.mobjects))
         self.wait(1.0)
         return super().construct()
