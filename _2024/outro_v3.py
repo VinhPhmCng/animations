@@ -233,14 +233,26 @@ class Blink(Succession):
         **kwargs
     ):
         animations = [
-            ApplyMethod(mobject.set_opacity, 1.0, run_time=0.0),
-            Wait(run_time=time_on),
-            ApplyMethod(mobject.set_opacity, 0.0, run_time=0.0),
-            Wait(run_time=time_off),
+            UpdateFromFunc(
+                mobject,
+                update_function=lambda mob: mob.set_opacity(1.0),
+                run_time=time_on,
+            ),
+            UpdateFromFunc(
+                mobject,
+                update_function=lambda mob: mob.set_opacity(0.0),
+                run_time=time_off,
+            ),
         ] * how_many_times
 
         if not ends_with_off:
-            animations.append(ApplyMethod(mobject.set_opacity, 1.0, run_time=0.0))
+            animations.append(
+                UpdateFromFunc(
+                    mobject,
+                    update_function=lambda mob: mob.set_opacity(1.0),
+                    run_time=time_on,
+                ),
+            )
 
         super().__init__(*animations, **kwargs)
 
