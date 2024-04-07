@@ -1,5 +1,8 @@
 from manim import *
 
+# Animation to introduce the year of creation of something
+# Inspirted by Fireship
+
 class CreatedIn(Scene):
     def construct(self):
         ############################################################
@@ -8,10 +11,10 @@ class CreatedIn(Scene):
         AFTER = 4
         YEAR_FONT='Noto Sans'
         YEAR_FONT_SIZE = 24
-        YEAR_COLOR = ManimColor.from_hex("#23a9f2", alpha=1.0)
+        YEAR_COLOR = ManimColor.from_hex("#FFD43B", alpha=1.0)
 
         BAR_WIDTH = 15
-        BAR_COLOR = ManimColor.from_hex("#23a9f2", alpha=1.0)
+        BAR_COLOR = ManimColor.from_hex("#4B8BBE", alpha=1.0)
         MARKERS_BUFF = 0.35
 
         UP_DISTANCE = 10
@@ -24,7 +27,7 @@ class CreatedIn(Scene):
         start_point = Dot().to_corner(DL, buff=0).shift(RIGHT*0.8)
         bar = Line(
             start=np.array([start_point.get_x(), start_point.get_y() - 1, 0]),
-            end=np.array([start_point.get_x(), start_point.get_y() - 20, 0]),
+            end=np.array([start_point.get_x(), start_point.get_y() - (2*(BEFORE+AFTER+1)+1), 0]),
         )
         bar.stroke_width = BAR_WIDTH
         bar.set_color(BAR_COLOR)
@@ -77,11 +80,19 @@ class CreatedIn(Scene):
         year_arrow.rotate(30*DEGREES).scale(0.08)
         year_arrow.next_to(years[BEFORE].target, LEFT, buff=0.4)
 
+        big_markers[BEFORE].save_state()
+        years[BEFORE].save_state()
         self.play(
             Transform(big_markers[BEFORE], year_marker),
             FadeIn(year_arrow, shift=RIGHT),
             MoveToTarget(years[BEFORE]),
         )
+        self.wait(1.0)
 
-        self.wait(0.1)
+        all.add(year_arrow)
+        self.play(
+            all.animate(run_time=UP_TIME).shift(UP*UP_DISTANCE*2),
+        )
+
+        self.wait(1.0)
         return super().construct()
