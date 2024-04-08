@@ -4,6 +4,13 @@ from manim import *
 
 class BP3(Scene):
     def construct(self):
+        def reset():
+            self.wait(1)
+            self.play(
+                *[FadeOut(mob)for mob in self.mobjects],
+                run_time=0.5,
+            )
+
         CUSTOM_PURPLE = ManimColor.from_hex("#d787d7", alpha=1.0)
 
         # Brainfuck example output
@@ -26,6 +33,7 @@ class BP3(Scene):
         for c in commands:
             self.play(FadeIn(c, shift=DOWN, run_time=0.2))
 
+        reset()
 
         # Introduce programming
         def symbols_background(mob, bg_color):
@@ -70,6 +78,8 @@ class BP3(Scene):
             RED_B, MAROON_B,
         ]
 
+        reset()
+
         keyword_texts = [
             Text(k, font="Monospace", color=WHITE)
             for k in [
@@ -96,6 +106,8 @@ class BP3(Scene):
                 FadeIn(keyword_texts[i], shift=RIGHT, run_time=0.2),
                 FadeIn(backgrounds[i], shift=RIGHT, run_time=0.2),
             )
+
+        reset()
 
         # Popular languages
         py = SVGMobject("logos/python-logo-generic.svg")
@@ -132,6 +144,8 @@ class BP3(Scene):
         self.play(Write(js, run_time=2))
         self.wait(0.2)
         self.play(MoveToTarget(js))
+
+        reset()
 
         # Definition
         txt1 = Text("A PROGRAMMING LANGUAGE", font="Monospace", color=CUSTOM_PURPLE).scale(1.2)
@@ -237,6 +251,8 @@ class BP3(Scene):
             SpiralIn(symbols, run_time=1.6),
         )
 
+        reset()
+
         # Good vs bad searches
         searches = ImageMobject("searches-fix.PNG", scale_to_resolution=QUALITIES["medium_quality"]["pixel_height"])
         searches.set_z_index(-3)
@@ -267,7 +283,6 @@ class BP3(Scene):
             FadeIn(bg, run_time=0.3),
             FadeIn(game_dev, shift=DOWN, run_time=0.8),
         )
-        
 
         game_engine = new_search("game engine", 2.476)
         game_engine.shift(UP*0.1 + LEFT*2.07)
@@ -292,7 +307,6 @@ class BP3(Scene):
             FadeIn(beginners, shift=UP, run_time=0.8),
         )
 
-        
         web_dev = new_search("web dev", 2.012).move_to(game_dev).align_to(game_dev, LEFT)
         web_course = new_search("web dev tutorial", 2.476).move_to(game_engine)
         web_beginners = new_search("for web dev newbies", 3.352).move_to(beginners).align_to(beginners, LEFT)
@@ -327,6 +341,8 @@ class BP3(Scene):
         print(deep_learning[1].width) #2.012
         print(web_course[1].width) # 2.476
         print(beginners[1].width) #3.352
+
+        reset()
 
         # Python vs C++
         py = SVGMobject("logos/python-logo-generic.svg")
@@ -461,6 +477,8 @@ class BP3(Scene):
             py.animate.scale(0.3).to_edge(UP, buff=0.15),
             cpp.animate.scale(0.3).to_edge(UP, buff=0.15),
         )
+
+        reset()
 
         # High levels example output
         lines = VGroup(*[Text(t, font="Monospace", font_size=24, color=GRAY_A) for t in [
